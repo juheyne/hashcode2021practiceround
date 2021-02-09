@@ -1,7 +1,7 @@
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument("file")
+parser.add_argument("file", nargs='+')
 args = parser.parse_args()
 print(args.file)
 
@@ -64,9 +64,10 @@ def solve(t2, t3, t4, pizzas):
 
 
 def main():
-    t2, t3, t4, pizzas = read_file(f"input/{args.file}.in")
-    deliveries = solve(t2, t3, t4, pizzas)
-    output_file(f"output/{args.file}.out", deliveries)
+    for file in args.file:
+        t2, t3, t4, pizzas = read_file(f"input/{file}.in")
+        deliveries = solve(t2, t3, t4, pizzas)
+        output_file(f"output/{file}.out", deliveries)
 
 
 main()
