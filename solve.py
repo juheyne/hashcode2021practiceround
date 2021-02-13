@@ -31,6 +31,12 @@ def output_file(file, deliveries):
 
 
 def find_unique_pizzas(pizzas):
+    """
+    Sort and count the pizzas based on their toppings
+
+    :param pizzas: dict of pizza ids mapped list of toppings
+    :return: unique pizzas: dict with tuple of toppings as keys and list of pizza ids as value
+    """
     unique_pizzas = dict()
 
     for pizza_id, toppings_as_list in pizzas.items():
@@ -48,8 +54,14 @@ def solve(t2, t3, t4, pizzas):
     pizza_ids = list(pizzas.keys())
 
     unique_pizzas = find_unique_pizzas(pizzas)
+    print("Unique pizzas: ", unique_pizzas)
 
-    print(pizza_ids)
+    # Sort pizzas by rareness, only works in Python 3.7+
+    # https://stackoverflow.com/questions/613183/how-do-i-sort-a-dictionary-by-value
+    pizzas_sorted = {k: v for k, v in sorted(unique_pizzas.items(), key=lambda item: len(item[1]))}
+
+    for toppings, pizza_ids in pizzas_sorted.items():
+        print(toppings, ":", pizza_ids)
 
     # Iterate over teams
     for _ in range(t2):
