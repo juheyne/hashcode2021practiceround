@@ -48,6 +48,27 @@ def find_unique_pizzas(pizzas):
     return unique_pizzas
 
 
+def find_best_match(set_of_ingredient, dict_ingredient_tuple_to_ids):
+    """
+    Finds best match to given set of ingredients
+
+    :param set_of_ingredient: set of ingredients to check for
+    :param dict_ingredient_tuple_to_ids: dict with ingredient tuple matching ids
+    :return: most_matching_id: one of the the id's with the best matching set from the dict
+    :return: most_matching_set: union of best matching set and passed set_of_ingredients
+    """
+    most_matching_count = -1
+    most_matching_id = -1
+    most_matching_set = {}
+    for key, value in dict_ingredient_tuple_to_ids.items():
+        new_set = set_of_ingredient.union(set(key))
+        if len(new_set) > most_matching_count:
+            most_matching_count = len(new_set)
+            most_matching_set = new_set
+            most_matching_id = value[0]
+    return most_matching_id, most_matching_set
+
+
 def solve(t2, t3, t4, pizzas):
     deliveries = []
 
