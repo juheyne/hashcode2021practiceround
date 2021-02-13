@@ -22,10 +22,8 @@ def read_file(file):
 
 
 def output_file(file, deliveries):
-    print(deliveries)
     with open(file, "w+") as f:
         f.write(f"{str(len(deliveries))}\n")
-        print(str(len(deliveries)))
         for delivery in deliveries:
             f.writelines(f"{len(delivery)} {' '.join(str(n) for n in delivery)}\n")
 
@@ -55,18 +53,59 @@ def find_best_match(set_of_ingredient, dict_ingredient_tuple_to_ids):
     :param set_of_ingredient: set of ingredients to check for
     :param dict_ingredient_tuple_to_ids: dict with ingredient tuple matching ids
     :return: most_matching_id: one of the the id's with the best matching set from the dict
-    :return: most_matching_set: union of best matching set and passed set_of_ingredients
+    :return: matched_set: toppings of best matching set and passed set_of_ingredients
     """
     most_matching_count = -1
     most_matching_id = -1
-    most_matching_set = {}
+    matched_set = set()
     for key, value in dict_ingredient_tuple_to_ids.items():
         new_set = set_of_ingredient.union(set(key))
         if len(new_set) > most_matching_count:
             most_matching_count = len(new_set)
-            most_matching_set = new_set
             most_matching_id = value[0]
-    return most_matching_id, most_matching_set
+            matched_set = key
+    return most_matching_id, matched_set
+
+
+def remove_pizza_id(pizzas, id):
+    pizzas = {toppings: ids.remove(id) for toppings, ids in pizzas.items()}  # remove id from list
+    pizzas = {toppings: ids for toppings, ids in pizzas.items() if not ids}
+    return pizzas
+
+
+def deliver_to_team(sorted_pizzas, team_size):
+    """
+    Combines pizza to deliver to team of given size. Only call if enough pizzas are left
+    :param sorted_pizzas: dict of toppings to list of ids
+    :param team_size: 2-4
+    :return:
+    """
+    # Select first pizza of most rare topping set
+    topping, pizza_ids = next(iter(sorted_pizzas.items()))
+    print("topping: ", topping, " ids: ", pizza_ids)
+    pizza_id = pizza_ids[0]
+    sorted_pizzas[topping].remove(pizza_id)
+    if not sorted_pizzas[topping]:
+        del sorted_pizzas[topping]
+
+    print("sorted_pizzas: ", sorted_pizzas)
+
+    delivery = [pizza_id]
+
+    # Feed team
+    for _ in range(team_size-1):
+        # Find until team is satisfied
+        # Find 2nd pizza
+        matched_id, matched_set = find_best_match(set(topping), sorted_pizzas)
+        delivery.append(matched_id)
+        sorted_pizzas[tuple(matched_set)].remove(matched_id)
+        if not sorted_pizzas[tuple(matched_set)]:
+            del sorted_pizzas[tuple(matched_set)]
+    return delivery, sorted_pizzas
+
+
+def remaining_pizzas(pizzas):
+    return len([item for sublist in pizzas.values() for item in sublist])
 
 
 def solve(t2, t3, t4, pizzas):
@@ -75,40 +114,32 @@ def solve(t2, t3, t4, pizzas):
     pizza_ids = list(pizzas.keys())
 
     unique_pizzas = find_unique_pizzas(pizzas)
-    print("Unique pizzas: ", unique_pizzas)
 
     # Sort pizzas by rareness, only works in Python 3.7+
     # https://stackoverflow.com/questions/613183/how-do-i-sort-a-dictionary-by-value
-    pizzas_sorted = {k: v for k, v in sorted(unique_pizzas.items(), key=lambda item: len(item[1]))}
+    sorted_pizzas = {k: v for k, v in sorted(unique_pizzas.items(), key=lambda item: len(item[1]))}
+    print("Sorted pizzas: ", sorted_pizzas)
 
-    for toppings, pizza_ids in pizzas_sorted.items():
-        print(toppings, ":", pizza_ids)
-
-    # Iterate over teams
-    for _ in range(t2):
-        if len(pizza_ids) < 2:
+    for _ in range(t4):
+        if remaining_pizzas(sorted_pizzas) < 4:
             break
-        current_delivery = []
-        for i in range(2):
-            current_delivery.append(pizza_ids.pop())
+        current_delivery, sorted_pizzas = deliver_to_team(sorted_pizzas, 4)
         deliveries.append(current_delivery)
 
     for _ in range(t3):
-        if len(pizza_ids) < 3:
+        if remaining_pizzas(sorted_pizzas) < 3:
             break
-        current_delivery = []
-        for i in range(3):
-            current_delivery.append(pizza_ids.pop())
+        current_delivery, sorted_pizzas = deliver_to_team(sorted_pizzas, 3)
         deliveries.append(current_delivery)
 
-    for _ in range(t4):
-        if len(pizza_ids) < 4:
+    # Iterate over teams
+    for _ in range(t2):
+        if remaining_pizzas(sorted_pizzas) < 2:
             break
-        current_delivery = []
-        for i in range(4):
-            current_delivery.append(pizza_ids.pop())
+        current_delivery, sorted_pizzas = deliver_to_team(sorted_pizzas, 2)
         deliveries.append(current_delivery)
 
+    print("Deliveries: ", deliveries)
     return deliveries
 
 
