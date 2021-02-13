@@ -30,10 +30,26 @@ def output_file(file, deliveries):
             f.writelines(f"{len(delivery)} {' '.join(str(n) for n in delivery)}\n")
 
 
+def find_unique_pizzas(pizzas):
+    unique_pizzas = dict()
+
+    for pizza_id, toppings_as_list in pizzas.items():
+        toppings = tuple(set(toppings_as_list))  # Convert first to set to order toppings and hashable tuple
+        if toppings in unique_pizzas:
+            unique_pizzas[toppings].append(pizza_id)
+        else:
+            unique_pizzas[toppings] = [pizza_id]
+    return unique_pizzas
+
+
 def solve(t2, t3, t4, pizzas):
     deliveries = []
 
     pizza_ids = list(pizzas.keys())
+
+    unique_pizzas = find_unique_pizzas(pizzas)
+
+    print(pizza_ids)
 
     # Iterate over teams
     for _ in range(t2):
@@ -70,4 +86,5 @@ def main():
         output_file(f"output/{file}.out", deliveries)
 
 
-main()
+if __name__ == "__main__":
+    main()
