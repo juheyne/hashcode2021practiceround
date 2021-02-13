@@ -17,7 +17,7 @@ def read_file(file):
             ingredients = line.split()[1:]
             pizzas[pizza] = ingredients
 
-        print(pizzas)
+        # print(pizzas)
         return int(t2), int(t3), int(t4), pizzas
 
 
@@ -82,13 +82,13 @@ def deliver_to_team(sorted_pizzas, team_size):
     """
     # Select first pizza of most rare topping set
     topping, pizza_ids = next(iter(sorted_pizzas.items()))
-    print("topping: ", topping, " ids: ", pizza_ids)
+    # print("topping: ", topping, " ids: ", pizza_ids)
     pizza_id = pizza_ids[0]
     sorted_pizzas[topping].remove(pizza_id)
     if not sorted_pizzas[topping]:
         del sorted_pizzas[topping]
 
-    print("sorted_pizzas: ", sorted_pizzas)
+    # print("sorted_pizzas: ", sorted_pizzas)
 
     delivery = [pizza_id]
 
@@ -118,7 +118,7 @@ def solve(t2, t3, t4, pizzas):
     # Sort pizzas by rareness, only works in Python 3.7+
     # https://stackoverflow.com/questions/613183/how-do-i-sort-a-dictionary-by-value
     sorted_pizzas = {k: v for k, v in sorted(unique_pizzas.items(), key=lambda item: len(item[1]))}
-    print("Sorted pizzas: ", sorted_pizzas)
+    # print("Sorted pizzas: ", sorted_pizzas)
 
     for _ in range(t4):
         if remaining_pizzas(sorted_pizzas) < 4:
@@ -139,7 +139,7 @@ def solve(t2, t3, t4, pizzas):
         current_delivery, sorted_pizzas = deliver_to_team(sorted_pizzas, 2)
         deliveries.append(current_delivery)
 
-    print("Deliveries: ", deliveries)
+    # print("Deliveries: ", deliveries)
     return deliveries
 
 
